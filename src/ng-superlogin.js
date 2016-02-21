@@ -188,12 +188,18 @@ angular.module('superlogin', [])
           session.serverTimeDiff = session.issued - slDateNow();
           superloginSession.setSession(session);
           $rootScope.$broadcast('sl:login', session);
-          oauthDeferred.resolve(session);
+          if (oauthDeferred) {
+            oauthDeferred.resolve(session);
+          }
         } else if(!error && link) {
           $rootScope.$broadcast('sl:link', link);
-          oauthDeferred.resolve(capitalizeFirstLetter(link) + ' successfully linked.');
+          if (oauthDeferred) {
+            oauthDeferred.resolve(capitalizeFirstLetter(link) + ' successfully linked.');
+          }
         } else {
-          oauthDeferred.reject(error);
+          if (oauthDeferred) {
+            oauthDeferred.reject(error);
+          }
         }
         oauthComplete = true;
         $rootScope.$apply();

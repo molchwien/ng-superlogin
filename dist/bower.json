@@ -1,14 +1,18 @@
 {
-  "name": "ng-superlogin",
-  "description": "Angular bindings for the SuperLogin project",
-  "version": "0.2.1",
-  "homepage": "http://github.com/colinskow/ng-superlogin",
-  "author": "Colin Skow",
+  "name": "ku-ng-superlogin",
+  "description": "ng-superlogin tailored for kuai.io",
+  "version": "1.0.0",
+  "homepage": "http://github.com/ybian/ng-superlogin",
+  "author": "Ying Bian",
   "repository": {
     "type": "git",
-    "url": "git://github.com/colinskow/ng-superlogin-bower.git"
+    "url": "git://github.com/ybian/ng-superlogin.git"
   },
-  "main": ["ng-superlogin.js"],
+  "main": ["dist/ng-superlogin.js"],
+  "ignore": [
+    "*",
+    "!dist/*"
+  ],
   "keywords": [
     "angular",
     "angularjs",
