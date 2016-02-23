@@ -314,12 +314,12 @@ angular.module('superlogin', [])
           }
           return oAuthPopup(superloginSession.getConfig().baseUrl + provider, {windowTitle: 'Login with ' + capitalizeFirstLetter(provider)});
         },
-        tokenSocialAuth: function(provider, accessToken) {
+        tokenSocialAuth: function(provider, code) {
           var providers = superloginSession.getConfig().providers;
           if(providers.indexOf(provider) === -1) {
             return $q.reject({error: 'Provider ' + provider + ' not supported.'});
           }
-          return $http.post(superloginSession.getConfig().baseUrl + provider + '/token', {access_token: accessToken})
+          return $http.post(superloginSession.getConfig().baseUrl + provider + '/token?code=' + code)
             .then(function(res) {
               if(res.data.user_id && res.data.token) {
                 res.data.serverTimeDiff = res.data.issued - slDateNow();
