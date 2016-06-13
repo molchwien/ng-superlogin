@@ -401,6 +401,18 @@ angular.module('superlogin', [])
               return $q.reject(err.data);
             });
         },
+        resetPassword2: function(form) {
+          return $http.post(superloginSession.getConfig().baseUrl + 'password-reset2', form)
+            .then(function(res) {
+              if(res.data.user_id && res.data.token) {
+                superloginSession.setSession(res.data);
+                $rootScope.$broadcast('sl:login', res.data);
+              }
+              return $q.when(res.data);
+            }, function(err) {
+              return $q.reject(err.data);
+            });
+        },
         changePassword: function(form) {
           if(superloginSession.authenticated()) {
             return $http.post(superloginSession.getConfig().baseUrl + 'password-change', form)
@@ -452,6 +464,7 @@ angular.module('superlogin', [])
         return $http.post(superloginSession.getConfig().baseUrl + 'refresh', {})
           .then(function(res) {
             if(res.data.token && res.data.expires) {
+              session.issued = res.data.issued;
               session.expires = res.data.expires;
               session.token = res.data.token;
               superloginSession.setSession(session);

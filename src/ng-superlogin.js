@@ -458,6 +458,7 @@ angular.module('superlogin', [])
         return $http.post(superloginSession.getConfig().baseUrl + 'refresh', {})
           .then(function(res) {
             if(res.data.token && res.data.expires) {
+              session.issued = res.data.issued;
               session.expires = res.data.expires;
               session.token = res.data.token;
               superloginSession.setSession(session);
