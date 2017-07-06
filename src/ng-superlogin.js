@@ -1,12 +1,18 @@
+/**
+ * @license ng-superlogin v0.2.1
+ * (c) 2015 Colin Skow
+ * License: MIT
+ */
+(function(angular) {
 'use strict';
 /* global angular */
 /* jshint -W097 */
 
 angular.module('superlogin', [])
 
-  .config(function($httpProvider) {
+  .config(["$httpProvider", function($httpProvider) {
     $httpProvider.interceptors.push('superloginInterceptor');
-  })
+  }])
 
   .factory('slDateNow', function() {
     return function(){
@@ -14,7 +20,7 @@ angular.module('superlogin', [])
     };
   })
 
-  .provider('superloginSession', function($windowProvider) {
+  .provider('superloginSession', ["$windowProvider", function($windowProvider) {
     var $window = $windowProvider.$get();
     var _config, _session, _refreshCB, _refreshInProgress;
     var self = this;
@@ -34,7 +40,7 @@ angular.module('superlogin', [])
       _config = config;
     };
 
-    this.$get = function($window, $rootScope, slDateNow) {
+    this.$get = ["$window", "$rootScope", "slDateNow", function($window, $rootScope, slDateNow) {
       // Apply defaults if there is no config
       if(!_config) {
         self.configure({});
@@ -108,6 +114,9 @@ angular.module('superlogin', [])
           return _session || JSON.parse(storage.getItem('superlogin.session'));
         },
         setSession: function(session) {
+	        
+          session.apiKey = $rootScope.apiKey;
+          
           _session = session;
           storage.setItem('superlogin.session', JSON.stringify(_session));
         },
@@ -170,15 +179,15 @@ angular.module('superlogin', [])
           _refreshCB = cb;
         }
       };
-    };
+    }];
 
-  })
+  }])
 
-  .provider('superlogin', function(superloginSessionProvider) {
+  .provider('superlogin', ["superloginSessionProvider", function(superloginSessionProvider) {
 
     this.configure = superloginSessionProvider.configure;
 
-    this.$get = function($http, $q, $window, $interval, $rootScope, superloginSession, slDateNow) {
+    this.$get = ["$http", "$q", "$window", "$interval", "$rootScope", "superloginSession", "slDateNow", function($http, $q, $window, $interval, $rootScope, superloginSession, slDateNow) {
 
       var oauthDeferred, oauthComplete;
 
@@ -473,7 +482,7 @@ angular.module('superlogin', [])
       function oAuthPopup(url, options) {
         oauthDeferred = $q.defer();
         oauthComplete = false;
-        options.windowName = options.windowName ||  'Social Login';
+        options.windowName = options.windowName ||  'Molch SSO Login';
         options.windowOptions = options.windowOptions || 'location=0,status=0,width=800,height=600';
         var _oauthWindow = $window.open(url, options.windowName, options.windowOptions);
         var _oauthInterval = $interval(function(){
@@ -493,11 +502,11 @@ angular.module('superlogin', [])
         return string.charAt(0).toUpperCase() + string.slice(1);
       }
 
-    };
+    }];
 
-  })
+  }])
 
-  .service('superloginInterceptor', function($rootScope, $q, $window, $location, superloginSession) {
+  .service('superloginInterceptor', ["$rootScope", "$q", "$window", "$location", "superloginSession", function($rootScope, $q, $window, $location, superloginSession) {
     var service = this;
     var parser = $window.document.createElement('a');
     var config = superloginSession.getConfig();
@@ -510,7 +519,10 @@ angular.module('superlogin', [])
       }
       if(checkEndpoint(request.url, endpoints)) {
         if(session && session.token) {
-          request.headers.Authorization = 'Bearer ' + session.token + ':' + session.password;
+          request.headers = {
+	          "Authorization": 'Bearer ' + session.token + ':' + session.password,
+	          "Api-Key": $rootScope.apikey
+        }
         }
       }
       return request;
@@ -535,4 +547,6 @@ angular.module('superlogin', [])
       return false;
     }
 
-  });
+  }]);
+
+})(angular);
